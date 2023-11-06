@@ -25,12 +25,21 @@ const bookSchema = new mongoose.Schema({
 const Book = mongoose.model('Book', bookSchema);
 
 // CREATE a new book
-app.post('/books', (req, res) => {
-  const book = new Book(req.body);
-  book.save()
-    .then(newBook => res.status(201).json(newBook))
-    .catch(err => res.status(500).json(err));
-});
+app.post('/books', async (req, res) => {
+    const books = req.body; // Assuming req.body is an array of books
+  
+    try {
+      const newBooks = [];
+      for (const bookData of books) {
+        const book = new Book(bookData);
+        const savedBook = await book.save();
+        newBooks.push(savedBook);
+      }
+      res.status(201).json(newBooks);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
 
 // READ all books
 app.get('/books', (req, res) => {
